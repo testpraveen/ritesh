@@ -1,12 +1,23 @@
-const mysql = require('mysql');
+const http = require('http');
+const url = require('url');
+const fs = require('fs');
 
-function getUser(userId) {
-    const query = "SELECT * FROM users WHERE id = " + userId;
-    connection.query(query, function(err, results) {
-        console.log(results);
+http.createServer(function(req, res) {
+    const query = url.parse(req.url, true).query;
+    
+    // SQL Injection - CodeQL will flag this
+    const userInput = query.id;
+    const sqlQuery = "SELECT * FROM users WHERE id = " + userInput;
+    
+    // XSS - CodeQL will flag this
+    res.write("<html><body>" + query.name + "</body></html>");
+    
+    // Code Injection - CodeQL will flag this
+    eval(query.code);
+    
+    // Path Traversal - CodeQL will flag this
+    fs.readFile("/var/www/" + query.file, function(err, data) {
+        res.end(data);
     });
-}
 
-eval(userInput);
-
-const password = "hardcoded_password_123";
+}).listen(8080);
