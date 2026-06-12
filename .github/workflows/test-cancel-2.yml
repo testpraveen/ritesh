@@ -1,0 +1,9 @@
+name: Test Cancel Workflow 2
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Long running step
+        run: sleep 500
